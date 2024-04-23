@@ -1,5 +1,6 @@
 sudo ovs-vsctl del-br br1
 sudo ip link del veth-faucet
+sudo ip link del veth-faucet-160
 # sudo ip link del veth-faucet-ovs
 
 sudo ovs-vsctl add-br br1 \
@@ -24,6 +25,20 @@ sudo ip link set veth-faucet-ovs up
 
 sudo ovs-docker add-port br1 sdn0 as150r-router0-10.150.0.254 --ipaddress=10.150.1.254/24
 
+sudo ovs-vsctl add-br br160 \
+-- set bridge br1 other-config:datapath-id=0000000000000002 \
+-- set bridge br1 other-config:disable-in-band=true \
+-- set bridge br1 fail_mode=secure \
+-- set-controller br1 tcp:127.0.0.1:6653
+
+sudo ovs-docker add-port br160 sdn0 host-c1 --ipaddress=10.160.1.1/24 --gateway=10.160.1.252
+sudo ovs-docker add-port br160 sdn0 as160r-router0-10.160.0.254 --ipaddress=10.160.1.254/24
+
+sudo ip link add faucet-160 type veth peer name faucet-ovs-160
+sudo ovs-vsctl add-port br160 faucet-ovs-160
+sudo ip addr add 10.160.1.253/24 dev faucet-160
+sudo ip link set faucet-160 up
+sudo ip link set faucet-ovs-160 up
 #docker cp ./bird.conf bgp-router:/etc/bird/bird.conf
 #chmod +x run-bird.sh
 #docker cp ./run-bird.sh bgp-router:/run-bird.sh
