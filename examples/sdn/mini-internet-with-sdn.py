@@ -10,7 +10,7 @@ from seedemu.core import Emulator, Service, Binding, Filter
 from seedemu.layers import Router
 from seedemu.raps import OpenVpnRemoteAccessProvider
 from seedemu.utilities import Makers
-
+from seedemu import *
 from typing import List, Tuple, Dict
 
 
@@ -150,5 +150,11 @@ emu.dump('base-component.bin')
 
 # Uncomment the following if you want to generate the final emulation files
 emu.render()
-emu.compile(Docker(), './output')
+#emu.compile(Docker(), './output')
+# Compilation
+docker = Docker(internetMapEnabled=True,platform=Platform.ARM64)
+# docker = Docker(internetMapEnabled=True, platform='Platform.ARM64')
+emu.compile(docker, './output', override = True)
+# emu.compile(Docker(internetMapEnabled=True, platform='arm'), './output')
+
 
